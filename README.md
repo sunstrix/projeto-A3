@@ -1,6 +1,5 @@
 # Projeto A3
 
-Este repositório é uma cópia aprimorada do projeto original.
 
 Características aplicadas:
 - Java 21
