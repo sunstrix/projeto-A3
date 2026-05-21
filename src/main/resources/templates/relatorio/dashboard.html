@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Relatórios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .projetos-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .projetos-list h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f5f7fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-andamento {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .badge-concluido {
+            background: #27ae60;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Dashboard de Projetos</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total de Projetos</div>
+                <div class="stat-number" th:text="${relatorio['totalProjetos']}"></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Em Andamento</div>
+                <div class="stat-number" th:text="${relatorio['projetosAtivos']}"></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Concluídos</div>
+                <div class="stat-number" th:text="${relatorio['projetosConcluidos']}"></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Cancelados</div>
+                <div class="stat-number" th:text="${relatorio['projetosCancelados']}"></div>
+            </div>
+        </div>
+        
+        <div class="projetos-list" th:if="${!relatorio['projetos'].isEmpty()}">
+            <h2>Projetos Recentes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Gerente</th>
+                        <th>Status</th>
+                        <th>Início</th>
+                        <th>Término</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="projeto : ${relatorio['projetos']}">
+                        <td th:text="${projeto.nome}"></td>
+                        <td th:text="${projeto.gerente.nome}"></td>
+                        <td>
+                            <span class="badge" th:classappend="${projeto.status.name() == 'EM_ANDAMENTO'} ? badge-andamento : badge-concluido"
+                                  th:text="${projeto.status.descricao}"></span>
+                        </td>
+                        <td th:text="${#dates.format(projeto.dataInicio, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#dates.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

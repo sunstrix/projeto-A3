@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projetos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .btn-novo {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .btn-novo:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .projetos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .projeto-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .projeto-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .projeto-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .projeto-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .badge-planejado {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .badge-andamento {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .badge-concluido {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .badge-cancelado {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .acoes {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-editar {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-editar:hover {
+            background: #2980b9;
+        }
+        
+        .btn-deletar {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-deletar:hover {
+            background: #c0392b;
+        }
+        
+        .vazio {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            background: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Projetos</h1>
+            <a href="/projetos/novo" class="btn-novo">+ Novo Projeto</a>
+        </div>
+        
+        <div class="projetos-grid" th:if="${!projetos.isEmpty()}">
+            <div class="projeto-card" th:each="projeto : ${projetos}">
+                <h2 th:text="${projeto.nome}"></h2>
+                
+                <span class="badge"
+                      th:classappend="${projeto.status.name() == 'PLANEJADO'} ? badge-planejado : ${projeto.status.name() == 'EM_ANDAMENTO'} ? badge-andamento : ${projeto.status.name() == 'CONCLUIDO'} ? badge-concluido : badge-cancelado"
+                      th:text="${projeto.status.descricao}"></span>
+                
+                <div class="projeto-info">
+                    <strong>Gerente:</strong> <span th:text="${projeto.gerente.nome}"></span>
+                </div>
+                
+                <div class="projeto-info">
+                    <strong>Início:</strong> <span th:text="${#dates.format(projeto.dataInicio, 'dd/MM/yyyy')}"></span>
+                </div>
+                
+                <div class="projeto-info">
+                    <strong>Término:</strong> <span th:text="${#dates.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy')}"></span>
+                </div>
+                
+                <p th:text="${projeto.descricao}" style="color: #666; font-size: 14px; margin: 10px 0;"></p>
+                
+                <div class="acoes">
+                    <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn btn-editar">✏️ Editar</a>
+                    <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn btn-deletar" 
+                       onclick="return confirm('Tem certeza?')">🗑️ Deletar</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="vazio" th:if="${projetos.isEmpty()}">
+            <p>Nenhum projeto cadastrado. <a href="/projetos/novo">Clique aqui</a> para criar um.</p>
+        </div>
+    </div>
+</body>
+</html>

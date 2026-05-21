@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .btn-novo {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .btn-novo:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .equipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .equipe-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .equipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .equipe-card h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .equipe-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .acoes {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-editar {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-editar:hover {
+            background: #2980b9;
+        }
+        
+        .btn-deletar {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-deletar:hover {
+            background: #c0392b;
+        }
+        
+        .vazio {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            background: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍💼 Equipes</h1>
+            <a href="/equipes/novo" class="btn-novo">+ Nova Equipe</a>
+        </div>
+        
+        <div class="equipes-grid" th:if="${!equipes.isEmpty()}">
+            <div class="equipe-card" th:each="equipe : ${equipes}">
+                <h2 th:text="${equipe.nome}"></h2>
+                
+                <div class="equipe-info">
+                    <strong>Líder:</strong> <span th:text="${equipe.lider.nome}"></span>
+                </div>
+                
+                <div class="equipe-info">
+                    <strong>Membros:</strong> <span th:text="${equipe.membros.size()}"></span>
+                </div>
+                
+                <div class="equipe-info">
+                    <strong>Projetos:</strong> <span th:text="${equipe.projetos.size()}"></span>
+                </div>
+                
+                <p th:text="${equipe.descricao}" style="color: #666; font-size: 14px; margin: 10px 0;"></p>
+                
+                <div class="acoes">
+                    <a th:href="@{/equipes/editar/{id}(id=${equipe.id})}" class="btn btn-editar">✏️ Editar</a>
+                    <a th:href="@{/equipes/deletar/{id}(id=${equipe.id})}" class="btn btn-deletar" 
+                       onclick="return confirm('Tem certeza?')">🗑️ Deletar</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="vazio" th:if="${equipes.isEmpty()}">
+            <p>Nenhuma equipe cadastrada. <a href="/equipes/novo">Clique aqui</a> para criar uma.</p>
+        </div>
+    </div>
+</body>
+</html>

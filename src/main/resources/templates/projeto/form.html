@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Projeto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-cancel {
+            background: #ecf0f1;
+            color: #333;
+        }
+        
+        .btn-cancel:hover {
+            background: #d5dbdb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Novo Projeto</h1>
+        
+        <div th:if="${erro}" class="error-message" th:text="${erro}"></div>
+        
+        <form th:action="${projeto.id} ? @{/projetos/atualizar/{id}(id=${projeto.id})} : @{/projetos}" 
+              th:object="${projeto}" method="post">
+            
+            <div class="form-group">
+                <label for="nome">Nome do Projeto</label>
+                <input type="text" id="nome" th:field="*{nome}" required>
+                <div class="error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" th:field="*{descricao}"></textarea>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="dataInicio">Data de Início</label>
+                    <input type="date" id="dataInicio" th:field="*{dataInicio}" required>
+                    <div class="error" th:if="${#fields.hasErrors('dataInicio')}" th:errors="*{dataInicio}"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dataTerminoPrevista">Data de Término Prevista</label>
+                    <input type="date" id="dataTerminoPrevista" th:field="*{dataTerminoPrevista}" required>
+                    <div class="error" th:if="${#fields.hasErrors('dataTerminoPrevista')}" th:errors="*{dataTerminoPrevista}"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label for="gerente">Gerente Responsável</label>
+                    <select id="gerente" th:field="*{gerente}" required>
+                        <option value="">Selecione um gerente</option>
+                        <option th:each="gerente : ${gerentes}" th:value="${gerente.id}" th:text="${gerente.nome}"></option>
+                    </select>
+                    <div class="error" th:if="${#fields.hasErrors('gerente')}" th:errors="*{gerente}"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" th:field="*{status}" required>
+                        <option value="">Selecione um status</option>
+                        <option th:each="status : ${status}" th:value="${status}" th:text="${status.descricao}"></option>
+                    </select>
+                    <div class="error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button type="submit" class="btn-submit">Salvar</button>
+                <a href="/projetos" class="btn-cancel" style="display: flex; align-items: center; justify-content: center; text-decoration: none;">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
