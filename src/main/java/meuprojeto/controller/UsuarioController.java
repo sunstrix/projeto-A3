@@ -1,7 +1,7 @@
-package br.com.projetoA3.controller;
+package meuprojeto.controller;
 
 import java.util.List;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import br.com.projetoA3.model.Usuario;
-import br.com.projetoA3.service.UsuarioService;
+import meuprojeto.model.Usuario;
+import meuprojeto.service.UsuarioService;
 
 @Controller
 @RequestMapping("/usuarios")
