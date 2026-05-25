@@ -172,8 +172,9 @@
             <div class="projeto-card" th:each="projeto : ${projetos}">
                 <h2 th:text="${projeto.nome}"></h2>
                 
+                <!-- ✅ LINHA CORRIGIDA: Expressão Thymeleaf unificada + #temporals para Spring Boot 3.2 -->
                 <span class="badge"
-                      th:classappend="${projeto.status.name() == 'PLANEJADO'} ? badge-planejado : ${projeto.status.name() == 'EM_ANDAMENTO'} ? badge-andamento : ${projeto.status.name() == 'CONCLUIDO'} ? badge-concluido : badge-cancelado"
+                      th:classappend="${projeto.status.name() == 'PLANEJADO' ? 'badge-planejado' : (projeto.status.name() == 'EM_ANDAMENTO' ? 'badge-andamento' : (projeto.status.name() == 'CONCLUIDO' ? 'badge-concluido' : 'badge-cancelado'))}"
                       th:text="${projeto.status.descricao}"></span>
                 
                 <div class="projeto-info">
@@ -181,11 +182,13 @@
                 </div>
                 
                 <div class="projeto-info">
-                    <strong>Início:</strong> <span th:text="${#dates.format(projeto.dataInicio, 'dd/MM/yyyy')}"></span>
+                    <strong>Início:</strong> 
+                    <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : ''}"></span>
                 </div>
                 
                 <div class="projeto-info">
-                    <strong>Término:</strong> <span th:text="${#dates.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy')}"></span>
+                    <strong>Término:</strong> 
+                    <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : ''}"></span>
                 </div>
                 
                 <p th:text="${projeto.descricao}" style="color: #666; font-size: 14px; margin: 10px 0;"></p>

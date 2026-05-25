@@ -152,11 +152,14 @@
                         <td th:text="${projeto.nome}"></td>
                         <td th:text="${projeto.gerente.nome}"></td>
                         <td>
-                            <span class="badge" th:classappend="${projeto.status.name() == 'EM_ANDAMENTO'} ? badge-andamento : badge-concluido"
+                            <!-- ✅ LINHA CORRIGIDA: Expressão Thymeleaf unificada -->
+                            <span class="badge" 
+                                  th:classappend="${projeto.status.name() == 'EM_ANDAMENTO' ? 'badge-andamento' : 'badge-concluido'}"
                                   th:text="${projeto.status.descricao}"></span>
                         </td>
-                        <td th:text="${#dates.format(projeto.dataInicio, 'dd/MM/yyyy')}"></td>
-                        <td th:text="${#dates.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy')}"></td>
+                        <!-- ✅ LINHAS CORRIGIDAS: Usando #temporals ao invés de #dates -->
+                        <td th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : ''}"></td>
+                        <td th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : ''}"></td>
                     </tr>
                 </tbody>
             </table>

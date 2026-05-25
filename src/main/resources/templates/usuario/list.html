@@ -10,18 +10,18 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #f5f7fa;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -30,11 +30,11 @@
             flex-wrap: wrap;
             gap: 20px;
         }
-        
+
         h1 {
             color: #333;
         }
-        
+
         .btn-novo {
             background: #667eea;
             color: white;
@@ -48,12 +48,12 @@
             display: inline-block;
             transition: all 0.3s;
         }
-        
+
         .btn-novo:hover {
             background: #5568d3;
             transform: translateY(-2px);
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -62,7 +62,7 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         th {
             background: #667eea;
             color: white;
@@ -70,21 +70,21 @@
             text-align: left;
             font-weight: 600;
         }
-        
+
         td {
             padding: 15px;
             border-bottom: 1px solid #ecf0f1;
         }
-        
+
         tr:hover {
             background: #f9f9f9;
         }
-        
+
         .acoes {
             display: flex;
             gap: 10px;
         }
-        
+
         .btn {
             padding: 8px 15px;
             border: none;
@@ -95,27 +95,27 @@
             display: inline-block;
             transition: all 0.3s;
         }
-        
+
         .btn-editar {
             background: #3498db;
             color: white;
         }
-        
+
         .btn-editar:hover {
             background: #2980b9;
             transform: translateY(-1px);
         }
-        
+
         .btn-deletar {
             background: #e74c3c;
             color: white;
         }
-        
+
         .btn-deletar:hover {
             background: #c0392b;
             transform: translateY(-1px);
         }
-        
+
         .vazio {
             text-align: center;
             padding: 40px;
@@ -123,7 +123,7 @@
             background: white;
             border-radius: 8px;
         }
-        
+
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -131,17 +131,17 @@
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         .badge-admin {
             background: #e74c3c;
             color: white;
         }
-        
+
         .badge-gerente {
             background: #f39c12;
             color: white;
         }
-        
+
         .badge-colaborador {
             background: #27ae60;
             color: white;
@@ -154,7 +154,7 @@
             <h1>👥 Usuários</h1>
             <a href="/usuarios/novo" class="btn-novo">+ Novo Usuário</a>
         </div>
-        
+
         <table th:if="${!usuarios.isEmpty()}">
             <thead>
                 <tr>
@@ -174,8 +174,9 @@
                     <td th:text="${usuario.email}"></td>
                     <td th:text="${usuario.cargo}"></td>
                     <td>
-                        <span class="badge" 
-                              th:classappend="${usuario.perfil.name() == 'ADMINISTRADOR'} ? badge-admin : ${usuario.perfil.name() == 'GERENTE'} ? badge-gerente : badge-colaborador"
+                        <!-- ✅ LINHA CORRIGIDA: Expressão Thymeleaf unificada -->
+                        <span class="badge"
+                              th:classappend="${usuario.perfil.name() == 'ADMINISTRADOR' ? 'badge-admin' : (usuario.perfil.name() == 'GERENTE' ? 'badge-gerente' : 'badge-colaborador')}"
                               th:text="${usuario.perfil.descricao}"></span>
                     </td>
                     <td>
@@ -185,14 +186,14 @@
                     <td>
                         <div class="acoes">
                             <a th:href="@{/usuarios/editar/{id}(id=${usuario.id})}" class="btn btn-editar">Editar</a>
-                            <a th:href="@{/usuarios/deletar/{id}(id=${usuario.id})}" class="btn btn-deletar" 
+                            <a th:href="@{/usuarios/deletar/{id}(id=${usuario.id})}" class="btn btn-deletar"
                                onclick="return confirm('Tem certeza que deseja deletar?')">Deletar</a>
                         </div>
                     </td>
                 </tr>
             </tbody>
         </table>
-        
+
         <div class="vazio" th:if="${usuarios.isEmpty()}">
             <p>Nenhum usuário cadastrado. <a href="/usuarios/novo">Clique aqui</a> para adicionar um.</p>
         </div>
