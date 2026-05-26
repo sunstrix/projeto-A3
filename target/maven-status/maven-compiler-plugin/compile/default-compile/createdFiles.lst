@@ -1,5 +1,4 @@
 meuprojeto\model\Projeto.class
-meuprojeto\config\SecurityConfig$LoginInterceptor.class
 meuprojeto\model\Tarefa.class
 meuprojeto\model\EquipeMembro.class
 meuprojeto\controller\EquipeController.class

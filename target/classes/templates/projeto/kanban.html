@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ✅ Meta tags para CSRF (opcionais, mas úteis) -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Kanban de Projetos</title>
     <style>
         * {
@@ -13,9 +16,27 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
+            background: #f5f7fa;
+            padding: 0;
             min-height: 100vh;
+        }
+
+        /* Layout com sidebar */
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            min-height: 100vh;
+            background: #f5f7fa;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 70px;
+                padding: 20px;
+            }
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
         }
 
         .container {
@@ -70,12 +91,6 @@
         @media (max-width: 1200px) {
             .kanban-board {
                 grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .kanban-board {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -246,173 +261,179 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📋 Quadro Kanban de Projetos</h1>
-            <a href="/projetos/novo" class="btn-novo">+ Novo Projeto</a>
-        </div>
-
-        <div class="kanban-board">
-            <!-- Coluna: Planejado -->
-            <div class="kanban-column column-planejado">
-                <div class="column-header">
-                    <div class="column-title">📌 Planejado</div>
-                    <div class="column-count" th:text="${#lists.size(projetosPlanejados)} + ' itens'">0 itens</div>
-                </div>
-                <div class="column-cards" 
-                     th:attr="data-status='PLANEJADO'"
-                     ondrop="drop(event)" 
-                     ondragover="allowDrop(event)"
-                     ondragleave="dragLeave(event)">
-                    <div class="project-card" 
-                         th:each="projeto : ${projetosPlanejados}"
-                         th:attr="draggable=true, data-id=${projeto.id}"
-                         ondragstart="drag(event)">
-                        <h3 th:text="${projeto.nome}"></h3>
-                        <div class="project-info">
-                            <strong>👤 Gerente:</strong>
-                            <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
-                        </div>
-                        <div class="project-info">
-                            <strong>📝 Descrição:</strong>
-                            <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
-                        </div>
-                        <div class="project-dates">
-                            <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
-                            <span>🏁 Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
-                        </div>
-                        <div class="project-actions">
-                            <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
-                            <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar" 
-                               onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
-                        </div>
-                    </div>
-                    <div class="empty-column" th:if="${#lists.isEmpty(projetosPlanejados)}">
-                        <span>📭</span>
-                        Nenhum projeto planejado
-                    </div>
-                </div>
+    <!-- ✅ MENU LATERAL -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    
+    <!-- ✅ CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>📋 Quadro Kanban de Projetos</h1>
+                <a href="/projetos/novo" class="btn-novo">+ Novo Projeto</a>
             </div>
 
-            <!-- Coluna: Em Andamento -->
-            <div class="kanban-column column-andamento">
-                <div class="column-header">
-                    <div class="column-title">🔄 Em Andamento</div>
-                    <div class="column-count" th:text="${#lists.size(projetosEmAndamento)} + ' itens'">0 itens</div>
-                </div>
-                <div class="column-cards" 
-                     th:attr="data-status='EM_ANDAMENTO'"
-                     ondrop="drop(event)" 
-                     ondragover="allowDrop(event)"
-                     ondragleave="dragLeave(event)">
-                    <div class="project-card" 
-                         th:each="projeto : ${projetosEmAndamento}"
-                         th:attr="draggable=true, data-id=${projeto.id}"
-                         ondragstart="drag(event)">
-                        <h3 th:text="${projeto.nome}"></h3>
-                        <div class="project-info">
-                            <strong>👤 Gerente:</strong>
-                            <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
+            <div class="kanban-board">
+                <!-- Coluna: Planejado -->
+                <div class="kanban-column column-planejado">
+                    <div class="column-header">
+                        <div class="column-title">📌 Planejado</div>
+                        <div class="column-count" th:text="${#lists.size(projetosPlanejados)} + ' itens'">0 itens</div>
+                    </div>
+                    <div class="column-cards" 
+                         th:attr="data-status='PLANEJADO'"
+                         ondrop="drop(event)" 
+                         ondragover="allowDrop(event)"
+                         ondragleave="dragLeave(event)">
+                        <div class="project-card" 
+                             th:each="projeto : ${projetosPlanejados}"
+                             th:attr="draggable=true, data-id=${projeto.id}"
+                             ondragstart="drag(event)">
+                            <h3 th:text="${projeto.nome}"></h3>
+                            <div class="project-info">
+                                <strong>👤 Gerente:</strong>
+                                <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
+                            </div>
+                            <div class="project-info">
+                                <strong>📝 Descrição:</strong>
+                                <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
+                            </div>
+                            <div class="project-dates">
+                                <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
+                                <span>🏁 Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
+                            </div>
+                            <div class="project-actions">
+                                <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
+                                <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar" 
+                                   onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
+                            </div>
                         </div>
-                        <div class="project-info">
-                            <strong> Descrição:</strong>
-                            <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
-                        </div>
-                        <div class="project-dates">
-                            <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
-                            <span> Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
-                        </div>
-                        <div class="project-actions">
-                            <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
-                            <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar"
-                               onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
+                        <div class="empty-column" th:if="${#lists.isEmpty(projetosPlanejados)}">
+                            <span>📭</span>
+                            Nenhum projeto planejado
                         </div>
                     </div>
-                    <div class="empty-column" th:if="${#lists.isEmpty(projetosEmAndamento)}">
-                        <span>📭</span>
-                        Nenhum projeto em andamento
-                    </div>
                 </div>
-            </div>
 
-            <!-- Coluna: Concluído -->
-            <div class="kanban-column column-concluido">
-                <div class="column-header">
-                    <div class="column-title">✅ Concluído</div>
-                    <div class="column-count" th:text="${#lists.size(projetosConcluidos)} + ' itens'">0 itens</div>
-                </div>
-                <div class="column-cards" 
-                     th:attr="data-status='CONCLUIDO'"
-                     ondrop="drop(event)" 
-                     ondragover="allowDrop(event)"
-                     ondragleave="dragLeave(event)">
-                    <div class="project-card" 
-                         th:each="projeto : ${projetosConcluidos}"
-                         th:attr="draggable=true, data-id=${projeto.id}"
-                         ondragstart="drag(event)">
-                        <h3 th:text="${projeto.nome}"></h3>
-                        <div class="project-info">
-                            <strong> Gerente:</strong>
-                            <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
+                <!-- Coluna: Em Andamento -->
+                <div class="kanban-column column-andamento">
+                    <div class="column-header">
+                        <div class="column-title">🔄 Em Andamento</div>
+                        <div class="column-count" th:text="${#lists.size(projetosEmAndamento)} + ' itens'">0 itens</div>
+                    </div>
+                    <div class="column-cards" 
+                         th:attr="data-status='EM_ANDAMENTO'"
+                         ondrop="drop(event)" 
+                         ondragover="allowDrop(event)"
+                         ondragleave="dragLeave(event)">
+                        <div class="project-card" 
+                             th:each="projeto : ${projetosEmAndamento}"
+                             th:attr="draggable=true, data-id=${projeto.id}"
+                             ondragstart="drag(event)">
+                            <h3 th:text="${projeto.nome}"></h3>
+                            <div class="project-info">
+                                <strong>👤 Gerente:</strong>
+                                <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
+                            </div>
+                            <div class="project-info">
+                                <strong>📝 Descrição:</strong>
+                                <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
+                            </div>
+                            <div class="project-dates">
+                                <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
+                                <span>🏁 Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
+                            </div>
+                            <div class="project-actions">
+                                <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
+                                <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar"
+                                   onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
+                            </div>
                         </div>
-                        <div class="project-info">
-                            <strong>📝 Descrição:</strong>
-                            <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
-                        </div>
-                        <div class="project-dates">
-                            <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
-                            <span>🏁 Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
-                        </div>
-                        <div class="project-actions">
-                            <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
-                            <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar"
-                               onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
+                        <div class="empty-column" th:if="${#lists.isEmpty(projetosEmAndamento)}">
+                            <span>📭</span>
+                            Nenhum projeto em andamento
                         </div>
                     </div>
-                    <div class="empty-column" th:if="${#lists.isEmpty(projetosConcluidos)}">
-                        <span>📭</span>
-                        Nenhum projeto concluído
-                    </div>
                 </div>
-            </div>
 
-            <!-- Coluna: Cancelado -->
-            <div class="kanban-column column-cancelado">
-                <div class="column-header">
-                    <div class="column-title">❌ Cancelado</div>
-                    <div class="column-count" th:text="${#lists.size(projetosCancelados)} + ' itens'">0 itens</div>
-                </div>
-                <div class="column-cards" 
-                     th:attr="data-status='CANCELADO'"
-                     ondrop="drop(event)" 
-                     ondragover="allowDrop(event)"
-                     ondragleave="dragLeave(event)">
-                    <div class="project-card" 
-                         th:each="projeto : ${projetosCancelados}"
-                         th:attr="draggable=true, data-id=${projeto.id}"
-                         ondragstart="drag(event)">
-                        <h3 th:text="${projeto.nome}"></h3>
-                        <div class="project-info">
-                            <strong>👤 Gerente:</strong>
-                            <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
+                <!-- Coluna: Concluído -->
+                <div class="kanban-column column-concluido">
+                    <div class="column-header">
+                        <div class="column-title">✅ Concluído</div>
+                        <div class="column-count" th:text="${#lists.size(projetosConcluidos)} + ' itens'">0 itens</div>
+                    </div>
+                    <div class="column-cards" 
+                         th:attr="data-status='CONCLUIDO'"
+                         ondrop="drop(event)" 
+                         ondragover="allowDrop(event)"
+                         ondragleave="dragLeave(event)">
+                        <div class="project-card" 
+                             th:each="projeto : ${projetosConcluidos}"
+                             th:attr="draggable=true, data-id=${projeto.id}"
+                             ondragstart="drag(event)">
+                            <h3 th:text="${projeto.nome}"></h3>
+                            <div class="project-info">
+                                <strong>👤 Gerente:</strong>
+                                <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
+                            </div>
+                            <div class="project-info">
+                                <strong>📝 Descrição:</strong>
+                                <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
+                            </div>
+                            <div class="project-dates">
+                                <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
+                                <span>🏁 Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
+                            </div>
+                            <div class="project-actions">
+                                <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
+                                <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar"
+                                   onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
+                            </div>
                         </div>
-                        <div class="project-info">
-                            <strong>📝 Descrição:</strong>
-                            <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
-                        </div>
-                        <div class="project-dates">
-                            <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
-                            <span>🏁 Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
-                        </div>
-                        <div class="project-actions">
-                            <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
-                            <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar"
-                               onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
+                        <div class="empty-column" th:if="${#lists.isEmpty(projetosConcluidos)}">
+                            <span>📭</span>
+                            Nenhum projeto concluído
                         </div>
                     </div>
-                    <div class="empty-column" th:if="${#lists.isEmpty(projetosCancelados)}">
-                        <span>📭</span>
-                        Nenhum projeto cancelado
+                </div>
+
+                <!-- Coluna: Cancelado -->
+                <div class="kanban-column column-cancelado">
+                    <div class="column-header">
+                        <div class="column-title">❌ Cancelado</div>
+                        <div class="column-count" th:text="${#lists.size(projetosCancelados)} + ' itens'">0 itens</div>
+                    </div>
+                    <div class="column-cards" 
+                         th:attr="data-status='CANCELADO'"
+                         ondrop="drop(event)" 
+                         ondragover="allowDrop(event)"
+                         ondragleave="dragLeave(event)">
+                        <div class="project-card" 
+                             th:each="projeto : ${projetosCancelados}"
+                             th:attr="draggable=true, data-id=${projeto.id}"
+                             ondragstart="drag(event)">
+                            <h3 th:text="${projeto.nome}"></h3>
+                            <div class="project-info">
+                                <strong>👤 Gerente:</strong>
+                                <span th:text="${projeto.gerente != null ? projeto.gerente.nome : 'Não definido'}"></span>
+                            </div>
+                            <div class="project-info">
+                                <strong>📝 Descrição:</strong>
+                                <span th:text="${#strings.abbreviate(projeto.descricao, 50)}"></span>
+                            </div>
+                            <div class="project-dates">
+                                <span>📅 Início: <span th:text="${projeto.dataInicio != null ? #temporals.format(projeto.dataInicio, 'dd/MM/yyyy') : '-'}"></span></span>
+                                <span>🏁 Término: <span th:text="${projeto.dataTerminoPrevista != null ? #temporals.format(projeto.dataTerminoPrevista, 'dd/MM/yyyy') : '-'}"></span></span>
+                            </div>
+                            <div class="project-actions">
+                                <a th:href="@{/projetos/editar/{id}(id=${projeto.id})}" class="btn-action btn-editar">✏️ Editar</a>
+                                <a th:href="@{/projetos/deletar/{id}(id=${projeto.id})}" class="btn-action btn-deletar"
+                                   onclick="return confirm('Tem certeza que deseja deletar este projeto?')">🗑️</a>
+                            </div>
+                        </div>
+                        <div class="empty-column" th:if="${#lists.isEmpty(projetosCancelados)}">
+                            <span>📭</span>
+                            Nenhum projeto cancelado
+                        </div>
                     </div>
                 </div>
             </div>
@@ -420,7 +441,7 @@
     </div>
 
     <script>
-        // Drag and Drop functions
+        // ✅ Funções de Drag and Drop - Simplificadas para Opção B
         function allowDrop(ev) {
             ev.preventDefault();
             ev.currentTarget.classList.add('drag-over');
@@ -448,11 +469,11 @@
             });
             
             if (projectId && newStatus) {
-                // Enviar requisição para atualizar o status
+                // ✅ Enviar requisição POST para atualizar status
                 fetch('/projetos/atualizar-status', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         id: parseInt(projectId),
@@ -464,12 +485,14 @@
                         // Recarregar a página para mostrar a nova posição
                         window.location.reload();
                     } else {
-                        alert('Erro ao atualizar status do projeto');
+                        return response.text().then(text => {
+                            throw new Error(text || 'Erro ao atualizar status');
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Erro:', error);
-                    alert('Erro ao conectar com o servidor');
+                    alert('Erro ao atualizar status: ' + error.message);
                 });
             }
         }
