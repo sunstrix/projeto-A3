@@ -20,10 +20,7 @@ public class LoginController {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
+    // ✅ REMOVIDO: @GetMapping("/") - agora é responsabilidade do MenuController
 
     @GetMapping("/login")
     public String login() {
@@ -39,22 +36,18 @@ public class LoginController {
             var usuario = usuarioService.findByLogin(login);
             
             if (usuario.isPresent() && usuario.get().getSenha().equals(senha) && usuario.get().getAtivo()) {
+                // Salva usuário na sessão
                 session.setAttribute("usuarioLogado", usuario.get());
                 
-                // Redireciona conforme o perfil
-                if (usuario.get().getPerfil().equals(Usuario.Perfil.ADMINISTRADOR)) {
-                    return "redirect:/usuarios";
-                } else if (usuario.get().getPerfil().equals(Usuario.Perfil.GERENTE)) {
-                    return "redirect:/projetos";
-                } else {
-                    return "redirect:/projetos";
-                }
+                // 🔥 REDIRECIONA TODOS PARA O MENU CENTRAL (/) 🔥
+                return "redirect:/";
+                
             } else {
                 model.addAttribute("erro", "Login ou senha inválidos");
                 return "login";
             }
         } catch (Exception e) {
-            model.addAttribute("erro", "Erro ao autenticar");
+            model.addAttribute("erro", "Erro ao autenticar: " + e.getMessage());
             return "login";
         }
     }

@@ -1,0 +1,67 @@
+<script>
+    // Funções de Drag and Drop
+    function allowDrop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.add('drag-over');
+    }
+
+    function dragLeave(ev) {
+        ev.currentTarget.classList.remove('drag-over');
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.dataset.id);
+        ev.target.classList.add('dragging');
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.remove('drag-over');
+        
+        const projectId = ev.dataTransfer.getData("text");
+        const newStatus = ev.currentTarget.dataset.status;
+        
+        // Remove dragging class from all cards
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.classList.remove('dragging');
+        });
+        
+        if (projectId && newStatus) {
+            // ✅ Obter token CSRF do meta tag (adicionado no head)
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+            
+            // Preparar headers
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (csrfToken) {
+                headers[csrfHeader] = csrfToken;
+            }
+            
+            // Enviar requisição com token CSRF
+            fetch('/projetos/atualizar-status', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    id: parseInt(projectId),
+                    status: newStatus
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Recarregar a página para mostrar a nova posição
+                    window.location.reload();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Erro ao atualizar status');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao atualizar status: ' + error.message);
+            });
+        }
+    }
+</script>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Projeto A3</title>
+    <!-- Incluir o navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 20px 0;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border-left: 4px solid #6c5ce7;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .dashboard-card h3 {
+            margin: 0 0 12px 0;
+            color: #1a1a2e;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-card p {
+            margin: 0;
+            color: #636e72;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .dashboard-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6c5ce7;
+            margin: 8px 0;
+        }
+
+        .stat-label {
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .welcome-banner h2 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+        }
+
+        .welcome-banner p {
+            margin: 0;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <!-- Banner de Boas-vindas -->
+        <div class="welcome-banner">
+            <h2>👋 Olá, <span th:text="${session.usuarioLogado.nome}">Usuário</span>!</h2>
+            <p th:text="${session.usuarioLogado.perfil.descricao}">Perfil</p>
+        </div>
+
+        <!-- Cards de Estatísticas (apenas para ADMIN/GERENTE) -->
+        <div class="stats-row" th:if="${session.usuarioLogado != null and (session.usuarioLogado.perfil.name() == 'ADMINISTRADOR' or session.usuarioLogado.perfil.name() == 'GERENTE')}">
+            <div class="stat-card">
+                <div class="stat-label">Total de Projetos</div>
+                <div class="stat-number" th:text="${stats.totalProjetos ?: 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Em Andamento</div>
+                <div class="stat-number" th:text="${stats.emAndamento ?: 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Equipes Ativas</div>
+                <div class="stat-number" th:text="${stats.equipesAtivas ?: 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Colaboradores</div>
+                <div class="stat-number" th:text="${stats.colaboradores ?: 0}">0</div>
+            </div>
+        </div>
+
+        <!-- Menu em Cards -->
+        <div class="dashboard-grid">
+            <!-- Usuários - Apenas ADMIN -->
+            <a th:if="${session.usuarioLogado != null and session.usuarioLogado.perfil.name() == 'ADMINISTRADOR'}" 
+               th:href="@{/usuarios}" class="dashboard-card">
+                <div class="icon">👥</div>
+                <h3>Gerenciar Usuários</h3>
+                <p>Cadastre, edite e remova usuários do sistema. Defina perfis de acesso e permissões.</p>
+            </a>
+
+            <!-- Projetos - ADMIN e GERENTE -->
+            <a th:if="${session.usuarioLogado != null and (session.usuarioLogado.perfil.name() == 'ADMINISTRADOR' or session.usuarioLogado.perfil.name() == 'GERENTE')}" 
+               th:href="@{/projetos}" class="dashboard-card">
+                <div class="icon">📁</div>
+                <h3>Projetos</h3>
+                <p>Crie e gerencie projetos, defina prazos, status e responsáveis.</p>
+            </a>
+
+            <!-- Kanban - ADMIN e GERENTE -->
+            <a th:if="${session.usuarioLogado != null and (session.usuarioLogado.perfil.name() == 'ADMINISTRADOR' or session.usuarioLogado.perfil.name() == 'GERENTE')}" 
+               th:href="@{/projetos/kanban}" class="dashboard-card">
+                <div class="icon">📋</div>
+                <h3>Quadro Kanban</h3>
+                <p>Visualize e organize seus projetos em um quadro interativo com drag-and-drop.</p>
+            </a>
+
+            <!-- Equipes - ADMIN e GERENTE -->
+            <a th:if="${session.usuarioLogado != null and (session.usuarioLogado.perfil.name() == 'ADMINISTRADOR' or session.usuarioLogado.perfil.name() == 'GERENTE')}" 
+               th:href="@{/equipes}" class="dashboard-card">
+                <div class="icon">👨‍💼</div>
+                <h3>Equipes</h3>
+                <p>Forme equipes, atribua membros e vincule a projetos específicos.</p>
+            </a>
+
+            <!-- Relatórios - ADMIN e GERENTE -->
+            <a th:if="${session.usuarioLogado != null and (session.usuarioLogado.perfil.name() == 'ADMINISTRADOR' or session.usuarioLogado.perfil.name() == 'GERENTE')}" 
+               th:href="@{/relatorios/dashboard}" class="dashboard-card">
+                <div class="icon">📈</div>
+                <h3>Relatórios</h3>
+                <p>Acesse dashboards com métricas, gráficos e exporte dados para análise.</p>
+            </a>
+
+            <!-- Minhas Tarefas - COLABORADOR -->
+            <a th:if="${session.usuarioLogado != null and session.usuarioLogado.perfil.name() == 'COLABORADOR'}" 
+               th:href="@{/tarefas/minhas}" class="dashboard-card">
+                <div class="icon">✅</div>
+                <h3>Minhas Tarefas</h3>
+                <p>Visualize e atualize o status das tarefas atribuídas a você.</p>
+            </a>
+
+            <!-- Perfil - Todos -->
+            <a th:href="@{/usuarios/meu-perfil}" class="dashboard-card">
+                <div class="icon">⚙️</div>
+                <h3>Meu Perfil</h3>
+                <p>Atualize suas informações pessoais, senha e preferências de conta.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

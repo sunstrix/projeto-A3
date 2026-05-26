@@ -1,187 +1,334 @@
-# Projeto A3
+# 🔐 Central de Projetos Multi-Perfil - Projeto A3
 
-Sistema de gestão de projetos multi-perfis, com autenticação, hierarquia, dashboard e integração a banco de dados relacional, desenvolvido em **Java 21** e **Spring Boot**.
+Sistema de gestão de projetos com segurança baseada em hierarquia de perfis. Desenvolvido em **Java 21** com **Spring Boot 3.2.0**.
 
----
+## 📋 Visão Geral
 
-## 🆕 **Resumo das Alterações Recentes**
+O sistema oferece uma solução completa para gerenciamento de projetos, equipes e usuários com controle de acesso por perfil. Cada perfil tem permissões específicas:
 
-**1. Integração com Banco de Dados Persistente (PostgreSQL)**
-- **Alteração:** Agora o projeto suporta banco de dados real, com configuração para PostgreSQL via perfil `prod`.
-- **Configuração:** Novo `application-prod.properties` e uso de variáveis de ambiente para acesso ao banco.
-- **pom.xml:** Adicionada dependência do driver do PostgreSQL.
-
-**2. Correção de Templates Thymeleaf**
-- **Problema:** Erros de sintaxe em condicionais e formatação de datas causavam erro 500.
-- **Correção:** Refatoradas expressões `th:classappend`, padronização dos ternários e datas com `#temporals` (compatível Java 21).
-- **Arquivos:** `usuario/list.html`, `projeto/list.html`, `relatorio/dashboard.html`.
-
-**3. Configurações de Inicialização**
-- **Scripts SQL:** Desligado modo auto (delegado ao Hibernate o controle de tabelas), evitando erro de schema e redundância.
-- **Porta:** Mantida em 8080.
-- **Perfis:** Separação clara para `dev` (H2 em memória) e `prod` (PostgreSQL).
+- **👤 Administrador**: Gerencia todos os usuários do sistema
+- **👨‍💼 Gerente**: Cria e gerencia projetos, monta equipes
+- **👥 Colaborador**: Visualiza projetos e atualiza status de tarefas
 
 ---
 
-## 💡 **O que é a Central de Projetos Multi-Perfil?**
+## ⚙️ Características Técnicas
 
-Sistema web para empresas centralizarem projetos, equipes e acesso baseado em perfis (Administrador, Gerente, Colaborador).
+### Stack Tecnológico
+- ✅ **Java 21** - Linguagem de programação
+- ✅ **Spring Boot 3.2.0** - Framework web
+- ✅ **Spring Data JPA** - Persistência de dados
+- ✅ **Thymeleaf** - Template engine
+- ✅ **H2 Database** - Banco de dados (desenvolvimento)
+- ✅ **Maven** - Gerenciador de dependências
+- ✅ **Jakarta Persistence** - ORM moderno
+- ✅ **JUnit 5** - Testes unitários
 
----
-
-## 🚥 **Características aplicadas**
-
-- **Java 21**
-- **Spring Boot** (Web, Thymeleaf, Data JPA)
-- **Banco:** H2 (dev) **/ PostgreSQL (prod)**
-- **Spring Profiles:** dev e prod, fáceis de alternar
-- **Flyway** para migrações (optativo)
-- **Estrutura professional**: controllers, model, repository, service, config, interceptor
-- **Sem Lombok** (códigos manuais, fácil manutenção)
-- **GitHub Actions:** build/test no CI
-- **Autenticação e autorização** por perfil
-- **Dashboard com relatórios**
-- **Testes unitários (JUnit)**
-
----
-
-## 📦 **Dependências-chave no pom.xml**
-
-```xml
-<dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
-    <scope>runtime</scope>
-</dependency>
-<dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>postgresql</artifactId>
-    <scope>runtime</scope>
-</dependency>
+### Estrutura do Projeto
+```
+src/main/java/meuprojeto/
+├── MeuProjetoApplication.java
+├── config/                    # Configurações de segurança
+│   └── SecurityConfig.java
+├── controller/                # Controladores REST/MVC
+│   ├── LoginController.java
+│   ├── UsuarioController.java
+│   ├── ProjetoController.java
+│   ├── EquipeController.java
+│   └── RelatorioController.java
+├── model/                     # Entidades JPA
+│   ├── Usuario.java
+│   ├── Projeto.java
+│   ├── Equipe.java
+│   └── EquipeMembro.java
+├── repository/                # Interfaces JPA
+│   ├── UsuarioRepository.java
+│   ├── ProjetoRepository.java
+│   ├── EquipeRepository.java
+│   └── EquipeMemberRepository.java
+├── service/                   # Lógica de negócio
+│   ├── UsuarioService.java
+│   ├── ProjetoService.java
+│   ├── EquipeService.java
+│   ├── RelatorioService.java
+│   └── CpfValidator.java
+└── exception/                 # Tratamento de exceções
+    └── AppException.java
 ```
 
 ---
 
-## 📂 **Estrutura do Projeto**
+## 🚀 Como Executar
 
-```
-projeto-A3/
-├── pom.xml
-├── src/
-│   └── main/
-│       ├── java/meuprojeto/
-│       │   ├── MeuProjetoApplication.java
-│       │   ├── config/ (segurança, inicialização)
-│       │   ├── controller/ (Login, Usuario, Projeto, Equipe, Relatorio)
-│       │   ├── model/ (Usuario, Projeto, Equipe, ...)
-│       │   ├── repository/
-│       │   ├── service/
-│       │   └── exception/
-│       └── resources/
-│           ├── application.properties          (desenvolvimento/H2)
-│           ├── application-prod.properties     (produção/PostgreSQL)
-│           └── templates/
-│               ├── usuario/list.html
-│               ├── projeto/list.html
-│               ├── equipe/list.html
-│               └── relatorio/dashboard.html
-```
+### Pré-requisitos
+- Java 21+ instalado
+- Maven 3.8.1+
+- Git
 
----
-
-## 🚀 **Como Executar**  
-
-**Desenvolvimento (H2):**
+### 1️⃣ Clone o Repositório
 ```bash
-mvn clean install -DskipTests
+git clone https://github.com/sunstrix/projeto-A3.git
+cd projeto-A3
+```
+
+### 2️⃣ Desenvolvimento (H2 em Memória)
+```bash
+# Compilar e rodar testes
+mvn clean install
+
+# Iniciar a aplicação
 mvn spring-boot:run
-# ou
+```
+
+A aplicação estará disponível em: **`http://localhost:8080/`**
+
+### 3️⃣ Produção (Empacotado)
+```bash
+# Gerar JAR executável
+mvn clean package
+
+# Executar o JAR
 java -jar target/projeto-A3-0.0.1-SNAPSHOT.jar
 ```
 
-**Produção (PostgreSQL):**
+### 4️⃣ Parar a Aplicação
 ```bash
-# Configure variáveis de ambiente:
-# No PowerShell (Windows)
-$env:SPRING_PROFILES_ACTIVE="prod"
-$env:DB_URL="jdbc:postgresql://localhost:5432/nome_do_banco"
-$env:DB_USERNAME="seu_usuario"
-$env:DB_PASSWORD="sua_senha"
-
-# Execute normalmente:
-mvn spring-boot:run
-# ou
-java -jar target/projeto-A3-0.0.1-SNAPSHOT.jar
+# No terminal onde a aplicação está rodando
+Ctrl + C
 ```
 
 ---
 
-## 👤 **Perfis de Acesso e Credenciais de Teste**
+## 🔐 Acesso ao Sistema
 
-| Login        | Senha    | Perfil         | Permissões                                      |
-|--------------|----------|---------------|-------------------------------------------------|
-| admin        | admin    | Administrador | Gerenciar usuários, ver todos os projetos       |
-| gerente      | gerente  | Gerente       | Criar/editar projetos, montar equipes           |
-| colaborador  | 123456   | Colaborador   | Visualizar projetos e relatórios                |
+### Credenciais de Teste
 
-> Você pode cadastrar mais usuários com perfis e CPFs válidos pelo próprio sistema (tela de administração).
+| Login | Senha | Perfil | Acesso |
+|-------|-------|--------|--------|
+| `admin` | `admin` | Administrador | Gerenciar usuários, ver todos os projetos |
+| `gerente` | `gerente` | Gerente | Criar/editar projetos, montar equipes |
+| `colaborador` | `123456` | Colaborador | Visualizar projetos, acessar relatórios |
 
----
+### Endereços Úteis
 
-## 🗂 **Funcionalidades principais**
-
-- Gestão de Usuários _(CRUD, ativar/desativar, perfis e validação de CPF)_
-- Gestão de Projetos _(vínculo com gerente, datas, status, equipes)_
-- Gestão de Equipes _(criar/remover membros, líderes)_
-- Dashboard e Relatórios
-- Segurança: login/senha, sessão, controle por perfil
-
----
-
-## 📝 **Exemplos de Telas (URLs Importantes)**
-
-- `/` — Home
-- `/login` — Login
-- `/usuarios` — Listagem/Gestão de usuários (admin)
-- `/projetos` — Gestão de projetos
-- `/equipes` — Gestão de equipes
-- `/relatorios/dashboard` — Dashboard de indicadores
+| Página | URL | Acesso |
+|--------|-----|--------|
+| 🏠 Home | `http://localhost:8080/` | Público |
+| 🔑 Login | `http://localhost:8080/login` | Público |
+| 👥 Usuários | `http://localhost:8080/usuarios` | Admin |
+| 📊 Projetos | `http://localhost:8080/projetos` | Gerente/Admin |
+| 👨‍💼 Equipes | `http://localhost:8080/equipes` | Gerente/Admin |
+| 📈 Dashboard | `http://localhost:8080/relatorios/dashboard` | Todos |
 
 ---
 
-## ⚙️ **Comandos úteis para o desenvolvedor**
+## 📝 Funcionalidades
 
-- Buildando sem rodar testes:
+### ✅ Gestão de Usuários
+- Cadastro com validação de CPF
+- Campos obrigatórios: Nome, CPF, Email, Cargo, Login, Senha, Perfil
+- Perfis: Administrador, Gerente, Colaborador
+- Usuários podem ser ativados/desativados
+
+### ✅ Gestão de Projetos
+- Cadastro com datas (início/término prevista)
+- Status: Planejado, Em Andamento, Concluído, Cancelado
+- Cada projeto tem um gerente responsável
+- Apenas gerente/admin pode criar projetos
+- Apenas gerente responsável ou admin pode editar
+
+### ✅ Gestão de Equipes
+- Cadastro de equipes com múltiplos membros
+- Uma equipe pode atuar em vários projetos
+- Líder da equipe é um Gerente
+- Adicionar/remover membros
+
+### ✅ Relatórios
+- Dashboard com estatísticas de projetos
+- Relatório de desempenho por projeto
+- Acompanhamento de progresso
+
+### ✅ Segurança
+- Sistema de autenticação com login/senha
+- Controle de acesso por perfil
+- Validação de CPF (algoritmo de dígito verificador)
+- Permissões específicas por perfil
+- Interceptor de segurança para todas as rotas
+
+---
+
+## 🗄️ Banco de Dados
+
+### Perfil: Development (Padrão)
+- **Banco**: H2 (em memória)
+- **Arquivo**: Nenhum (dados em RAM)
+- **Resetado**: A cada reinicialização
+- **Configuração**: `application-dev.properties`
+
+### Perfil: Production
+- **Banco**: PostgreSQL
+- **Variáveis de Ambiente**:
   ```bash
-  mvn clean package -DskipTests
+  DB_URL=jdbc:postgresql://localhost:5432/projeto_a3
+  DB_USERNAME=postgres
+  DB_PASSWORD=sua_senha
   ```
-- Rodar aplicando perfil desejado:
-  ```bash
-  mvn spring-boot:run -Dspring-boot.run.profiles=dev
-  mvn spring-boot:run -Dspring-boot.run.profiles=prod
-  ```
-- Ajuste de portas:
-  ```
-  spring:
-    server.port=8080
-  ```
+
+### Tabelas Principais
+- `usuarios` - Usuários do sistema
+- `projetos` - Projetos
+- `equipes` - Equipes
+- `equipe_membros` - Membros das equipes
+- `equipe_projeto` - Relação equipe-projeto (many-to-many)
 
 ---
 
-## ☝️ **Notas técnicas**
+## 🧪 Testes
 
-- **Templates Thymeleaf:** sintaxe compatível com Spring Boot 3+/Java 21
-- **Banco de dados:** as tabelas são criadas automaticamente pelo Hibernate
-- **Migração para PostgreSQL:** alterne facilmente os perfis e faça deploy real
+Executar testes unitários:
+```bash
+mvn test
+```
 
----
-
-## 🤝 **Licença & Contribuição**
-
-Abra issues, contribua e adapte à sua realidade.
-
-Projeto de estudos e demonstração – Maio/2026
+Visualizar resultados:
+```
+target/surefire-reports/
+```
 
 ---
 
-**Qualquer dúvida ou melhoria que queira implementar, abra uma _issue_ ou me pergunte!**
+## 📊 Fluxo de Uso
+
+### 1. Administrador
+```
+Login (admin/admin)
+    ↓
+Acessar /usuarios
+    ↓
+Gerenciar usuários (criar, editar, deletar)
+    ↓
+Visualizar todos os projetos (/projetos)
+```
+
+### 2. Gerente
+```
+Login (gerente/gerente)
+    ↓
+Acessar /projetos
+    ↓
+Criar novo projeto
+    ↓
+Acessar /equipes
+    ↓
+Montar equipe e vincular a projetos
+    ↓
+Acompanhar progresso via Dashboard
+```
+
+### 3. Colaborador
+```
+Login (colaborador/123456)
+    ↓
+Visualizar /projetos
+    ↓
+Visualizar /relatorios/dashboard
+    ↓
+Atualizar status de tarefas
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Erro: "Porta 8080 já está em uso"
+```bash
+# Encontrar processo usando a porta (Windows)
+netstat -ano | findstr :8080
+
+# Matar o processo
+taskkill /PID <PID> /F
+
+# Ou usar porta diferente
+java -Dserver.port=8090 -jar target/projeto-A3-0.0.1-SNAPSHOT.jar
+```
+
+### Erro: CPF inválido durante cadastro
+- Certifique-se de usar um CPF válido (com dígitos verificadores corretos)
+- CPFs válidos para teste:
+  - `11144477735` - João Silva
+  - `87654321596` - Maria Silva
+  - `39053344705` - Pedro Santos
+
+### Erro: "Cannot find symbol" durante compilação
+```bash
+mvn clean install -U
+```
+
+---
+
+## 📦 Build & Deploy
+
+### Gerar WAR (para Tomcat)
+```bash
+mvn clean package -DskipTests -Pprod
+```
+
+### Docker (Opcional)
+```dockerfile
+FROM openjdk:21-slim
+COPY target/projeto-A3-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+```bash
+docker build -t projeto-a3 .
+docker run -p 8080:8080 projeto-a3
+```
+
+---
+
+## 📝 Configurações
+
+### application-dev.properties
+```properties
+spring.application.name=projeto-A3
+spring.profiles.active=dev
+server.port=8080
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.jpa.hibernate.ddl-auto=update
+spring.sql.init.mode=always
+spring.sql.init.data-locations=classpath:data.sql
+```
+
+---
+
+## 🔗 Links Úteis
+
+- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- [Jakarta Persistence](https://jakarta.ee/specifications/persistence/)
+- [Thymeleaf Template Engine](https://www.thymeleaf.org/)
+- [H2 Database](https://www.h2database.com/)
+
+---
+
+## 👥 Autores
+
+- **Desenvolvedor**: @sunstrix
+- **Data de Criação**: Maio 2026
+
+---
+
+## 📄 Licença
+
+Este projeto está sob licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+## 📞 Suporte
+
+Para dúvidas ou problemas, abra uma issue no GitHub: 
+[Issues - Projeto A3](https://github.com/sunstrix/projeto-A3/issues)
+
+---
+
+**Última atualização**: 21 de Maio de 2026 ✅

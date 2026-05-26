@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Projetos Multi-Perfil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .feature {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .feature p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Central de Projetos Multi-Perfil</h1>
+            <p>Gestão de Projetos com Segurança e Hierarquia</p>
+        </div>
+        
+        <div class="content">
+            <div class="features-grid">
+                <div class="feature">
+                    <h2>👥 Gestão de Usuários</h2>
+                    <p>Cadastro com perfis de acesso: Administrador, Gerente e Colaborador. Validação de CPF integrada.</p>
+                </div>
+                
+                <div class="feature">
+                    <h2>📊 Gestão de Projetos</h2>
+                    <p>Crie projetos com datas, status e atribua um gerente responsável. Acompanhe o progresso em tempo real.</p>
+                </div>
+                
+                <div class="feature">
+                    <h2>👨‍💼 Gestão de Equipes</h2>
+                    <p>Monte equipes com múltiplos membros que podem atuar em vários projetos simultaneamente.</p>
+                </div>
+                
+                <div class="feature">
+                    <h2>📈 Relatórios</h2>
+                    <p>Gere relatórios de desempenho e acompanhamento detalhados de cada projeto.</p>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <a href="/login" class="btn btn-primary">🔑 Fazer Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

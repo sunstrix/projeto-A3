@@ -6,10 +6,15 @@ import meuprojeto.model.Projeto;
 import meuprojeto.model.Usuario;
 import meuprojeto.service.ProjetoService;
 import meuprojeto.service.UsuarioService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projetos")
@@ -36,6 +41,52 @@ public class ProjetoController {
         }
         
         return "projeto/list";
+    }
+
+    @GetMapping("/kanban")
+    public String kanban(Model model) {
+        List<Projeto> todosProjetos = projetoService.findAll();
+        
+        model.addAttribute("projetosPlanejados", 
+            todosProjetos.stream()
+                .filter(p -> p.getStatus() == Projeto.Status.PLANEJADO)
+                .collect(Collectors.toList()));
+        
+        model.addAttribute("projetosEmAndamento", 
+            todosProjetos.stream()
+                .filter(p -> p.getStatus() == Projeto.Status.EM_ANDAMENTO)
+                .collect(Collectors.toList()));
+        
+        model.addAttribute("projetosConcluidos", 
+            todosProjetos.stream()
+                .filter(p -> p.getStatus() == Projeto.Status.CONCLUIDO)
+                .collect(Collectors.toList()));
+        
+        model.addAttribute("projetosCancelados", 
+            todosProjetos.stream()
+                .filter(p -> p.getStatus() == Projeto.Status.CANCELADO)
+                .collect(Collectors.toList()));
+        
+        return "projeto/kanban";
+    }
+
+    @PostMapping("/atualizar-status")
+    @ResponseBody
+    public ResponseEntity<?> atualizarStatus(@RequestBody Map<String, Object> payload) {
+        try {
+            Long id = Long.valueOf(payload.get("id").toString());
+            String statusStr = payload.get("status").toString();
+            
+            Projeto projeto = projetoService.findById(id);
+            if (projeto != null) {
+                projeto.setStatus(Projeto.Status.valueOf(statusStr));
+                projetoService.save(projeto);
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
     }
 
     @GetMapping("/novo")
