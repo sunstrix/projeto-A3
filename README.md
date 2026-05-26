@@ -1,171 +1,130 @@
+# Projeto A3
+
+Sistema de gestão de projetos multi-perfis com Java 21, Spring Boot, templates Thymeleaf e persistência real de dados.
+
+---
+
+## 🆕 Principais Atualizações
+
+### 1. **Integração com Banco de Dados PostgreSQL**
+- **Novo:** Sistema agora usa PostgreSQL para dados persistentes (perfil `prod`).
+- **pom.xml:** Adicionada dependência do driver PostgreSQL.
+- **Configuração:** Novo arquivo `application-prod.properties` com instruções para uso de variáveis de ambiente.
+
+### 2. **Correções em Templates Thymeleaf**
+- **Erros anteriores:** Whitelabel Error Page (500) causados por sintaxe incompatível.
+- **Correção:** Todas as expressões ternárias e condicionais Th:classappend/Th:if ajustadas conforme Thymeleaf 3.x.
+- **Formatação:** Uso do `#temporals` para datas (compatível com Java 21).
+
+### 3. **Startup e Configuração**
+- **Spring SQL init:** Desligado o modo de inicialização de scripts SQL (deixa Hibernate criar as tabelas).
+- **Porta e Perfis:** Rodando na porta 8080, fácil alternar entre dev (H2) e prod (PostgreSQL).
+
+---
+
+## 📦 Dependências no pom.xml
+
+```xml
+<!-- ...outras dependências... -->
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+</dependency>
+<!-- ... -->
+```
+
+---
+
+## 📂 Estrutura do Projeto
+
+Arquivos principais e alterados:
+
+```
+projeto-A3/
+├── pom.xml                                <-- atualizado: PostgreSQL
+├── src/
+│   └── main/
+│       ├── java/meuprojeto/               <-- códigos das entidades, services, repositories, controllers
+│       │   └── ...
+│       └── resources/
+│           ├── application.properties
+│           ├── application-prod.properties <-- novo: PostgreSQL
+│           └── templates/
+│               ├── usuario/list.html       <-- corrigido th:classappend
+│               ├── projeto/list.html       <-- corrigido expressão/data
+│               ├── equipe/list.html        <-- verificado
+│               └── relatorio/dashboard.html<-- corrigido expressão/data
+```
+
 ---
 
 ## 🚀 Como Executar
 
-### Pré-requisitos
-
-- [Java 21 JDK](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
-- [Maven 3.9+](https://maven.apache.org/download.cgi)
-- [Git](https://git-scm.com/downloads)
-
-### Desenvolvimento (H2 em Memória)
-
+### Desenvolvimento (H2 em memória)
 ```bash
-git clone https://github.com/sunstrix/projeto-A3.git
-cd projeto-A3
-mvn clean install
+mvn clean install -DskipTests
 mvn spring-boot:run
 ```
 
-A aplicação estará disponível em: **http://localhost:8080**
-
-### Produção (JAR Empacotado)
-
+### Produção (PostgreSQL)
 ```bash
-mvn clean package -DskipTests
+# Configure variáveis de ambiente com dados do banco:
+# (No Windows PowerShell)
+$env:SPRING_PROFILES_ACTIVE="prod"
+$env:DB_URL="jdbc:postgresql://localhost:5432/nome_do_banco"
+$env:DB_USERNAME="seu_usuario"
+$env:DB_PASSWORD="sua_senha"
+
+# Rode o projeto
+mvn spring-boot:run
+```
+Ou:
+```bash
 java -jar target/projeto-A3-0.0.1-SNAPSHOT.jar
 ```
+(Lembrando de configurar o perfil e os dados de conexão!)
 
 ---
 
-## 🔐 Acesso ao Sistema
+## 👤 Credenciais de Teste (padrão)
 
-### Credenciais de Teste
-
-| Perfil | Login | Senha | Acesso |
-|--------|-------|-------|--------|
-| Administrador | `admin` | `admin` | Gerenciar usuários, ver todos os projetos |
-| Gerente | `gerente` | `gerente` | Criar/editar projetos, montar equipes |
-| Colaborador | `colaborador` | `123456` | Visualizar projetos, acessar relatórios |
-
-### Endereços Úteis
-
-| Página | URL | Acesso |
-|--------|-----|--------|
-| 🏠 Home | `http://localhost:8080/` | Público |
-| 🔑 Login | `http://localhost:8080/login` | Público |
-| 👥 Usuários | `http://localhost:8080/usuarios` | Admin |
-| 📊 Projetos | `http://localhost:8080/projetos` | Gerente/Admin |
-| 👨‍💼 Equipes | `http://localhost:8080/equipes` | Gerente/Admin |
-| 📈 Dashboard | `http://localhost:8080/relatorios/dashboard` | Todos |
+| Login        | Senha    | Perfil         |
+|--------------|----------|---------------|
+| admin        | admin    | Administrador |
+| gerente      | gerente  | Gerente       |
+| colaborador  | 123456   | Colaborador   |
 
 ---
 
-## 📝 Funcionalidades
+## 💻 Links Importantes
 
-- **Gestão de Usuários**: Cadastro com validação de CPF, ativação/desativação e controle de perfis (Administrador, Gerente, Colaborador)
-- **Gestão de Projetos**: Cadastro com datas de início e término, status (Planejado, Em Andamento, Concluído, Cancelado) e gerente responsável
-- **Gestão de Equipes**: Equipes com múltiplos membros, líder Gerente e vínculo a projetos
-- **Relatórios**: Dashboard com estatísticas, desempenho por projeto e acompanhamento de progresso
-- **Segurança**: Autenticação com login/senha, controle de acesso por perfil, validação de CPF e interceptor de segurança em todas as rotas
-
----
-
-## 🗄️ Banco de Dados
-
-### Perfil: Development (Padrão)
-
-Banco H2 em memória, sem arquivo físico, resetado a cada reinicialização.
-
-```properties
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.jpa.hibernate.ddl-auto=update
-spring.sql.init.mode=always
-spring.sql.init.data-locations=classpath:data.sql
-```
-
-### Perfil: Production (PostgreSQL)
-
-```bash
-DB_URL=jdbc:postgresql://localhost:5432/projeto_a3
-DB_USERNAME=postgres
-DB_PASSWORD=sua_senha
-```
-
-### Tabelas Principais
-
-- `usuarios` — Usuários do sistema
-- `projetos` — Projetos
-- `equipes` — Equipes
-- `equipe_membros` — Membros das equipes
-- `equipe_projeto` — Relação equipe-projeto (many-to-many)
+- `/usuarios`        — Gerenciar usuários (admin)
+- `/projetos`        — Gerenciar projetos (gerente/admin)
+- `/equipes`         — Equipes
+- `/relatorios/dashboard` — Dashboard de relatórios
 
 ---
 
-## 🧪 Testes
+## ❗️Observações
 
-```bash
-mvn test
-```
-
-Resultados disponíveis em `target/surefire-reports/`.
+- Templates Thymeleaf possuem sintaxe ajustada para máxima compatibilidade com Spring Boot 3+ e Java 21.
+- Para produzir facilmente para PostgreSQL, use o perfil `prod` e ajuste seus ambientes conforme exemplo acima.
+- Se for rodar em dev, basta usar o default com H2 (nada a instalar).
 
 ---
 
-## 🐛 Troubleshooting
+## 🤝 Contribuição
 
-### Porta 8080 já em uso
-
-```bash
-netstat -ano | findstr :8080
-taskkill /PID <PID> /F
-
-# Ou usar porta diferente
-java -Dserver.port=8090 -jar target/projeto-A3-0.0.1-SNAPSHOT.jar
-```
-
-### CPF inválido durante cadastro
-
-Use um CPF com dígitos verificadores corretos. CPFs válidos para teste: `11144477735`, `87654321596`, `39053344705`.
-
-### Erro "Cannot find symbol" durante compilação
-
-```bash
-mvn clean install -U
-```
+Colabore, envie issues com dúvidas e sugestões!
 
 ---
 
-## 📦 Docker (Opcional)
+## 📅 Última atualização
 
-```dockerfile
-FROM openjdk:21-slim
-COPY target/projeto-A3-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
-```
-
-```bash
-docker build -t projeto-a3 .
-docker run -p 8080:8080 projeto-a3
-```
-
----
-
-## 🔗 Links Úteis
-
-- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
-- [Jakarta Persistence](https://jakarta.ee/specifications/persistence/)
-- [Thymeleaf Template Engine](https://www.thymeleaf.org/)
-- [H2 Database](https://www.h2database.com/)
-
----
-
-## 👥 Autores
-
-**Desenvolvedor**: @sunstrix — Maio 2026
-
----
-
-## 📄 Licença
-
-Este projeto está sob licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
----
-
-## 📞 Suporte
-
-Para dúvidas ou problemas, abra uma issue: [Issues - Projeto A3](https://github.com/sunstrix/projeto-A3/issues)
-
----
-
-> 💡 Para desenvolvimento local, use o perfil padrão com banco H2 em memória. Para produção, configure as variáveis de ambiente e use PostgreSQL.
+Mai/2026
