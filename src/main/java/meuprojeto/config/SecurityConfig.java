@@ -38,11 +38,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers(new AntPathRequestMatcher("/projetos/atualizar-status"))
+                .ignoringRequestMatchers(
+                    new AntPathRequestMatcher("/projetos/atualizar-status"),
+                    new AntPathRequestMatcher("/login/autenticar")  // ✅ Adicionar CSRF ignorado para login customizado
+                )
             )
             .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/", "/error").permitAll()
+                .requestMatchers(
+                    "/login",                    // Página de login
+                    "/login/autenticar",         // ✅ Endpoint de autenticação manual
+                    "/logout",                   // Logout
+                    "/css/**",                   // CSS
+                    "/js/**",                    // JavaScript
+                    "/images/**",                // Imagens
+                    "/error"                     // Página de erro
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
