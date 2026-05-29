@@ -38,27 +38,28 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers(
-                    new AntPathRequestMatcher("/projetos/atualizar-status"),
-                    new AntPathRequestMatcher("/login/autenticar")  // ✅ Adicionar CSRF ignorado para login customizado
-                )
+                .ignoringRequestMatchers(new AntPathRequestMatcher("/projetos/atualizar-status"))
             )
             .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/login",                    // Página de login
-                    "/login/autenticar",         // ✅ Endpoint de autenticação manual
-                    "/logout",                   // Logout
-                    "/css/**",                   // CSS
-                    "/js/**",                    // JavaScript
-                    "/images/**",                // Imagens
-                    "/error"                     // Página de erro
+                    "/login",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/",
+                    "/error"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
+            // ✅ Usar Spring Security Form Login (não custom)
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true)
+                .loginProcessingUrl("/login")              // ✅ URL onde Spring Security processa o login
+                .usernameParameter("username")              // ✅ Parametro esperado do form
+                .passwordParameter("password")              // ✅ Parametro esperado do form
+                .defaultSuccessUrl("/menu", true)           // ✅ Redireciona após sucesso
+                .failureUrl("/login?error=true")            // ✅ Redireciona em caso de erro
                 .permitAll()
             )
             .logout(logout -> logout
