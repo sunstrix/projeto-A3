@@ -45,4 +45,4 @@ git version 2.54.0.windows.1
 [96m========================================================[0m
 
 Log salvo em: "C:\Users\SuporteNSF\Desktop\projeto-A3\log_erro.txt"
-Pressione qualquer tecla para continuar. . . 
+Pressione qualquer tecla para continuar. . . ^C

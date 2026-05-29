@@ -1,6 +1,7 @@
 meuprojeto\model\Projeto.class
 meuprojeto\model\Tarefa.class
 meuprojeto\model\EquipeMembro.class
+meuprojeto\service\UsuarioDetailsService.class
 meuprojeto\controller\EquipeController.class
 meuprojeto\repository\EquipeRepository.class
 meuprojeto\service\UsuarioService.class
