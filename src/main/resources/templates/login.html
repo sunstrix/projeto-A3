@@ -102,23 +102,39 @@
         .back-link a:hover {
             text-decoration: underline;
         }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h1>🔐 Login</h1>
         
-        <div th:if="${erro}" class="error-message" th:text="${erro}"></div>
+        <!-- ✅ Mensagem de erro do Spring Security -->
+        <div th:if="${param.error}" class="error-message">
+            Usuário ou senha inválidos
+        </div>
         
-        <form action="/login/autenticar" method="post">
+        <!-- ✅ Usar formulário nativo do Spring Security -->
+        <form method="post" action="/login">
             <div class="form-group">
-                <label for="login">Usuário</label>
-                <input type="text" id="login" name="login" required>
+                <label for="username">Usuário</label>
+                <!-- ✅ Nome correto do parâmetro: "username" -->
+                <input type="text" id="username" name="username" required>
             </div>
             
             <div class="form-group">
-                <label for="senha">Senha</label>
-                <input type="password" id="senha" name="senha" required>
+                <label for="password">Senha</label>
+                <!-- ✅ Nome correto do parâmetro: "password" -->
+                <input type="password" id="password" name="password" required>
             </div>
             
             <button type="submit">Entrar</button>
@@ -126,6 +142,12 @@
         
         <div class="back-link">
             <a href="/">← Voltar ao início</a>
+        </div>
+
+        <div class="info-box">
+            <strong>Credenciais de teste:</strong><br>
+            <strong>Login:</strong> admin<br>
+            <strong>Senha:</strong> admin
         </div>
     </div>
 </body>
