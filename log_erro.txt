@@ -1,0 +1,48 @@
+[INFO] Iniciando ambiente e validando scripts... 
+[96m========================================================[0m
+[1m[97m  CONFIGURACAO DO AMBIENTE - PROJETO A3[0m
+[97m  Java 21 | Maven | PostgreSQL (Latest) | Git[0m
+[96m========================================================[0m
+
+[96m[PASSO 1] Verificando Java JDK 21...[0m
+[92m[OK] Java 21 ja instalado.[0m
+openjdk version "21.0.11" 2026-04-21 LTS
+
+[96m[PASSO 2] Verificando Apache Maven...[0m
+[92m[OK] Maven ja instalado.[0m
+Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
+
+[96m[PASSO 3] Instalando PostgreSQL (Ultima versao)...[0m
+[93m[A] Tentando winget (PostgreSQL 17)...[0m
+[93m[A] v17 falhou (codigo: -1978335189). Tentando v16...[0m
+[93m[A] v16 falhou (codigo: -1978335189). Tentando v15...[0m
+[92m[OK] PostgreSQL 15 instalado via winget.[0m
+[92mPATH atualizado: C:\Program Files\PostgreSQL\17\bin[0m
+
+[96m[PASSO 4] Verificando Git...[0m
+[92m[OK] Git ja instalado.[0m
+git version 2.54.0.windows.1
+
+[96m========================================================[0m
+[1m[97m  VERIFICACAO FINAL DAS VERSOES[0m
+[96m========================================================[0m
+[97mJava:[0m
+openjdk version "21.0.11" 2026-04-21 LTS
+
+[97mMaven:[0m
+Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
+
+[97mPostgreSQL:[0m
+psql (PostgreSQL) 17.10
+
+[97mGit:[0m
+git version 2.54.0.windows.1
+
+[96m========================================================[0m
+[1m[92m  CONCLUIDO[0m
+[93m  IMPORTANTE: Feche este terminal e abra um NOVO terminal[0m
+[93m  para carregar as novas variaveis de ambiente.[0m
+[96m========================================================[0m
+
+Log salvo em: "C:\Users\SuporteNSF\Desktop\projeto-A3\log_erro.txt"
+Pressione qualquer tecla para continuar. . . 
